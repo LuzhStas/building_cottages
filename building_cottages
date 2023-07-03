@@ -1,0 +1,49 @@
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# Define the command for starting the bot
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text("Welcome to the Cottage Calculator Bot! "
+                              "Please provide the necessary inputs for the calculations.")
+
+# Define the command for calculating coefficients and errors
+def calculate(update: Update, context: CallbackContext):
+    # Get the input values from the user
+    length = float(context.args[0])
+    width = float(context.args[1])
+    height = float(context.args[2])
+    area = length * width
+
+    # Calculate the coefficients and errors
+    coefficient_1 = area / height
+    coefficient_2 = (length + width) / area
+    error_1 = coefficient_1 * 0.1
+    error_2 = coefficient_2 * 0.05
+
+    # Format the results
+    result = f"Results:\n"
+    result += f"Coefficient 1: {coefficient_1:.2f} +/- {error_1:.2f}\n"
+    result += f"Coefficient 2: {coefficient_2:.2f} +/- {error_2:.2f}"
+
+    # Send the results to the user
+    update.message.reply_text(result)
+
+# Define the main function to run the bot
+def main():
+    # Telegram bot token
+    token = "YOUR_BOT_TOKEN"
+
+    # Create an updater and dispatcher
+    updater = Updater(token, use_context=True)
+    dispatcher = updater.dispatcher
+
+    # Register command handlers
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("calculate", calculate))
+
+    # Start the bot
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
